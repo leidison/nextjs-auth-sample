@@ -5,7 +5,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [Keycloak],
     pages: {
         signIn: "/api/signin",
-        signOut: "/api/signout",
     },
     callbacks: {
         async jwt({ token, account }) {
@@ -24,17 +23,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
     },
     events: {
-        signOut: async ({ session, token }: ay) => {
+        signOut: async ({ token }: ay) => {
             const { provider, id_token } = token
-
-            console.log('token', token)
 
             if (provider == 'keycloak') {
                 try {
-                    // Add the id_token_hint to the query string
                     const params = new URLSearchParams()
                     params.append('id_token_hint', id_token)
-                    // const { status, statusText } = await axios.get(`${keycloak.options.issuer}/protocol/openid-connect/logout?${params.toString()}`)
 
                     const resp = await fetch(`${process.env.AUTH_KEYCLOAK_ISSUER}/protocol/openid-connect/logout?${params.toString()}`, {
                         method: 'GET',
